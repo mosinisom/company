@@ -279,10 +279,10 @@ function displayDepartments(departments) {
             <tbody>
                 ${departments.map(dep => `
                     <tr>
-                        <td>${dep.Name}</td>
+                        <td>${dep.name}</td>
                         <td>
-                            <button onclick="editDepartment(${dep.Id})">Редактировать</button>
-                            <button onclick="deleteDepartment(${dep.Id})">Удалить</button>
+                            <button onclick="editDepartment(${dep.id})">Редактировать</button>
+                            <button onclick="deleteDepartment(${dep.id})">Удалить</button>
                         </td>
                     </tr>
                 `).join('')}
@@ -303,16 +303,19 @@ function displayProjects(projects) {
                 </tr>
             </thead>
             <tbody>
-                ${projects.map(proj => `
+                ${projects.map(proj => {
+            const department = departments.find(dep => dep.id === proj.departmentId);
+            return `
                     <tr>
-                        <td>${proj.Name}</td>
-                        <td>${proj.DepartmentId}</td>
+                        <td>${proj.name}</td>
+                        <td>${department ? department.name : 'Без отдела'}</td>
                         <td>
                             <button onclick="editProject(${proj.id})">Редактировать</button>
                             <button onclick="deleteProject(${proj.id})">Удалить</button>
                         </td>
                     </tr>
-                `).join('')}
+                  `;
+              }).join('')}
             </tbody>
         </table>
     `;
@@ -587,11 +590,11 @@ function showProjectForm(project = null) {
     const formData = new FormData(e.target);
     const data = {
       id: project?.id,
-      name: formData.get('name'), 
-      description: formData.get('description'),  
-      status: formData.get('status'), 
-      startDate: formData.get('startDate'), 
-      endDate: formData.get('endDate') || null, 
+      name: formData.get('name'),
+      description: formData.get('description'),
+      status: formData.get('status'),
+      startDate: formData.get('startDate'),
+      endDate: formData.get('endDate') || null,
       createdAt: new Date().toISOString()
     };
 
