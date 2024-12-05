@@ -1,4 +1,5 @@
-/* wwwroot/style.css */
+/* Root Variables
+-------------------------------------------------- */
 :root {
   --primary-color: #2E7D32;
   --secondary-color: #4CAF50;
@@ -6,8 +7,12 @@
   --background-color: #E8F5E9;
   --text-color: #1B5E20;
   --error-color: #C62828;
+  --gray-color: #757575;
+  --gray-dark: #616161;
 }
 
+/* Base Styles
+-------------------------------------------------- */
 body {
   font-family: 'Segoe UI', sans-serif;
   margin: 0;
@@ -21,6 +26,9 @@ body {
   margin: 0 auto;
 }
 
+/* Components
+-------------------------------------------------- */
+/* Card */
 .card {
   background: white;
   border-radius: 8px;
@@ -29,6 +37,7 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Tabs */
 .tabs {
   display: flex;
   margin-bottom: 20px;
@@ -49,6 +58,7 @@ body {
   border-radius: 8px 8px 0 0;
 }
 
+/* Buttons */
 button {
   background-color: var(--secondary-color);
   color: white;
@@ -63,6 +73,23 @@ button:hover {
   background-color: var(--primary-color);
 }
 
+.btn-danger {
+  background-color: var(--error-color);
+}
+
+.btn-danger:hover {
+  background-color: #b71c1c;
+}
+
+.btn-secondary {
+  background-color: var(--gray-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--gray-dark);
+}
+
+/* Tables */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -75,8 +102,18 @@ button:hover {
   border-bottom: 1px solid var(--accent-color);
 }
 
+.table button+button {
+  margin-left: 8px;
+}
+
+/* Forms
+-------------------------------------------------- */
 .form-group {
   margin-bottom: 15px;
+}
+
+.form-group+.form-group {
+  margin-top: 15px;
 }
 
 .form-group label {
@@ -90,24 +127,16 @@ button:hover {
   padding: 8px;
   border: 1px solid var(--accent-color);
   border-radius: 4px;
+  box-sizing: border-box;
 }
 
-.alert {
-  padding: 15px;
-  border-radius: 4px;
-  margin-bottom: 20px;
+textarea.form-control {
+  resize: vertical;
+  min-height: 100px;
 }
 
-.alert-success {
-  background-color: var(--accent-color);
-  color: white;
-}
-
-.alert-error {
-  background-color: var(--error-color);
-  color: white;
-}
-
+/* Modal
+-------------------------------------------------- */
 .modal {
   position: fixed;
   top: 0;
@@ -126,8 +155,88 @@ button:hover {
   border-radius: 8px;
   width: 500px;
   max-width: 90%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
+.modal-content h3 {
+  margin-top: 0;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--accent-color);
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 1;
+}
+
+.modal-content form {
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 20px;
+  margin: 15px 0;
+  max-height: calc(90vh - 130px);
+}
+
+.modal-content .button-group {
+  padding: 15px 20px;
+  margin: 0 -20px;
+  border-top: 2px solid var(--accent-color);
+  position: sticky;
+  bottom: 0;
+  background: white;
+  z-index: 1;
+}
+
+.modal .btn {
+  margin-top: 20px;
+}
+
+/* Scrollbar Styling */
+.modal-content form::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content form::-webkit-scrollbar-track {
+  background: var(--background-color);
+  border-radius: 4px;
+}
+
+.modal-content form::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 4px;
+}
+
+.modal-content form::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
+
+/* Utilities
+-------------------------------------------------- */
+/* Alerts */
+.alert {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  z-index: 1000;
+  animation: slideIn 0.3s ease-out;
+}
+
+.alert-success {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.alert-error {
+  background-color: var(--error-color);
+  color: white;
+}
+
+/* Pagination */
 .pagination {
   display: flex;
   justify-content: center;
@@ -147,22 +256,8 @@ button:hover {
   color: white;
 }
 
-.btn-danger {
-  background-color: var(--error-color);
-}
-
-.btn-danger:hover {
-  background-color: #b71c1c;
-}
-
-.alert {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1000;
-  animation: slideIn 0.3s ease-out;
-}
-
+/* Animations
+-------------------------------------------------- */
 @keyframes slideIn {
   from {
     transform: translateX(100%);
@@ -173,29 +268,4 @@ button:hover {
     transform: translateX(0);
     opacity: 1;
   }
-}
-
-.modal textarea {
-  resize: vertical;
-  min-height: 100px;
-}
-
-.btn-secondary {
-  background-color: #757575;
-}
-
-.btn-secondary:hover {
-  background-color: #616161;
-}
-
-.form-group+.form-group {
-  margin-top: 15px;
-}
-
-.modal .btn {
-  margin-top: 20px;
-}
-
-.table button+button {
-  margin-left: 8px;
 }

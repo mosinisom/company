@@ -1,4 +1,3 @@
-// wwwroot/script.js
 let socket;
 const PAGE_SIZE = 10;
 let currentPage = 1;
@@ -136,7 +135,7 @@ function displayPositions(positions) {
             <td>${pos.title}</td>
             <td>${pos.salaryRange}</td>
             <td>
-              <button onclick="showPositionForm(${JSON.stringify(pos)})">Редактировать</button>
+              <button onclick='showPositionForm(${JSON.stringify(pos).replace(/'/g, "&#39;")})'>Редактировать</button>
               <button onclick="deletePosition(${pos.id})">Удалить</button>
             </td>
           </tr>
@@ -207,7 +206,7 @@ function showPositionForm(position = null) {
 }
 
 async function deletePosition(id) {
-  if (confirm('Вы уверены, что хотите удалить эту должность?')) {
+  if (customConfirm('Вы уверены, что хотите удалить эту должность?')) {
     try {
       sendMessage({ action: 'deletePosition', id });
     } catch (error) {
@@ -247,17 +246,32 @@ function displayEmployees(employees) {
         </tr>
       </thead>
       <tbody>
-        ${items.map(emp => `
-          <tr>
-            <td>${emp.FirstName} ${emp.LastName}</td>
-            <td>${emp.Email}</td>
-            <td>${emp.DepartmentName || 'Без отдела'}</td>
-            <td>
-              <button onclick="showEmployeeForm(${JSON.stringify(emp)})">Редактировать</button>
-              <button class="btn-danger" onclick="deleteEmployee(${emp.Id})">Удалить</button>
-            </td>
-          </tr>
-        `).join('')}
+        ${items.map(emp => {
+    const employee = {
+      id: emp.Id,
+      firstName: emp.FirstName,
+      lastName: emp.LastName,
+      email: emp.Email,
+      phone: emp.Phone,
+      birthDate: emp.BirthDate,
+      hireDate: emp.HireDate,
+      departmentId: emp.DepartmentId,
+      positionId: emp.PositionId,
+      address: emp.Address,
+      createdAt: emp.CreatedAt
+    };
+    return `
+            <tr>
+              <td>${emp.FirstName} ${emp.LastName}</td>
+              <td>${emp.Email}</td>
+              <td>${emp.DepartmentName || 'Без отдела'}</td>
+              <td>
+                <button onclick='showEmployeeForm(${JSON.stringify(employee).replace(/'/g, "&#39;")})'>Редактировать</button>
+                <button class="btn-danger" onclick="deleteEmployee(${emp.Id})">Удалить</button>
+              </td>
+            </tr>
+          `;
+  }).join('')}
       </tbody>
     </table>
   `;
@@ -269,56 +283,67 @@ function displayEmployees(employees) {
 function displayDepartments(departments) {
   const container = document.getElementById('departmentsList');
   container.innerHTML = `
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Название</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${departments.map(dep => `
-                    <tr>
-                        <td>${dep.name}</td>
-                        <td>
-                            <button onclick="editDepartment(${dep.id})">Редактировать</button>
-                            <button onclick="deleteDepartment(${dep.id})">Удалить</button>
-                        </td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        </table>
-    `;
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Название</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${departments.map(dep => `
+          <tr>
+            <td>${dep.name}</td>
+            <td>
+              <button onclick='showDepartmentForm(${JSON.stringify(dep).replace(/'/g, "&#39;")})'>Редактировать</button>
+              <button onclick="deleteDepartment(${dep.id})">Удалить</button>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
 }
 
 function displayProjects(projects) {
   const container = document.getElementById('projectsList');
   container.innerHTML = `
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Название</th>
-                    <th>Отдел</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${projects.map(proj => {
-            const department = departments.find(dep => dep.id === proj.departmentId);
-            return `
-                    <tr>
-                        <td>${proj.name}</td>
-                        <td>${department ? department.name : 'Без отдела'}</td>
-                        <td>
-                            <button onclick="editProject(${proj.id})">Редактировать</button>
-                            <button onclick="deleteProject(${proj.id})">Удалить</button>
-                        </td>
-                    </tr>
-                  `;
-              }).join('')}
-            </tbody>
-        </table>
-    `;
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Название</th>
+          <th>Отдел</th>
+          <th>Статус</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${projects.map(proj => {
+    const department = departments.find(dep => dep.id === proj.departmentId);
+    return `
+            <tr>
+              <td>${proj.name}</td>
+              <td>${department ? department.name : 'Без отдела'}</td>
+              <td>${getProjectStatus(proj.status)}</td>
+              <td>
+                <button onclick='showProjectForm(${JSON.stringify(proj).replace(/'/g, "&#39;")})'>Редактировать</button>
+                <button onclick="deleteProject(${proj.id})">Удалить</button>
+              </td>
+            </tr>
+          `;
+  }).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function getProjectStatus(status) {
+  const statuses = {
+    'new': 'Новый',
+    'in_progress': 'В работе',
+    'completed': 'Завершен'
+  };
+  return statuses[status] || status;
 }
 
 function showError(message) {
@@ -329,7 +354,7 @@ function showError(message) {
   setTimeout(() => alert.remove(), 3000);
 }
 
-function confirm(message) {
+function customConfirm(message) {
   return window.confirm(message);
 }
 
@@ -355,61 +380,66 @@ async function showEmployeeForm(employee = null) {
     <div class="modal-content">
       <h3>${employee ? 'Редактировать' : 'Добавить'} сотрудника</h3>
       <form id="employeeForm">
-        <div class="form-group">
-          <label>Имя</label>
-          <input class="form-control" name="firstName" value="${employee?.firstName || ''}" required>
+        <div class="form-content">
+          <div class="form-group">
+            <label>Имя</label>
+            <input class="form-control" name="firstName" value="${employee?.firstName || ''}" required>
+          </div>
+          <div class="form-group">
+            <label>Фамилия</label>
+            <input class="form-control" name="lastName" value="${employee?.lastName || ''}" required>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input class="form-control" type="email" name="email" value="${employee?.email || ''}" required>
+          </div>
+          <div class="form-group">
+            <label>Телефон</label>
+            <input class="form-control" type="tel" name="phone" value="${employee?.phone || ''}" required>
+          </div>
+          <div class="form-group">
+            <label>Дата рождения</label>
+            <input class="form-control" type="date" name="birthDate" value="${employee?.birthDate?.split('T')[0] || ''}" required>
+          </div>
+          <div class="form-group">
+            <label>Дата приема</label>
+            <input class="form-control" type="date" name="hireDate" value="${employee?.hireDate?.split('T')[0] || ''}" required>
+          </div>
+          <div class="form-group">
+            <label>Отдел</label>
+            <select class="form-control" name="departmentId">
+              <option value="">Без отдела</option>
+              ${departments?.map(d => `
+                <option value="${d.id}" ${employee?.departmentId === d.id ? 'selected' : ''}>
+                  ${d.name}
+                </option>
+              `)?.join('') || ''}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Должность</label>
+            <select class="form-control" name="positionId" required>
+              <option value="">Выберите должность</option>
+              ${positions?.map(p => `
+                <option value="${p.id}" ${employee?.positionId === p.id ? 'selected' : ''}>
+                  ${p.title}
+                </option>
+              `)?.join('') || ''}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Адрес</label>
+            <input class="form-control" name="address" value="${employee?.address || ''}" required>
+          </div>
         </div>
-        <div class="form-group">
-          <label>Фамилия</label>
-          <input class="form-control" name="lastName" value="${employee?.lastName || ''}" required>
+        <div class="button-group">
+          <button type="submit" class="btn">Сохранить</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Отмена</button>
         </div>
-        <div class="form-group">
-          <label>Email</label>
-          <input class="form-control" type="email" name="email" value="${employee?.email || ''}" required>
-        </div>
-        <div class="form-group">
-          <label>Телефон</label>
-          <input class="form-control" type="tel" name="phone" value="${employee?.phone || ''}" required>
-        </div>
-        <div class="form-group">
-          <label>Дата рождения</label>
-          <input class="form-control" type="date" name="birthDate" value="${employee?.birthDate?.split('T')[0] || ''}" required>
-        </div>
-        <div class="form-group">
-          <label>Дата приема</label>
-          <input class="form-control" type="date" name="hireDate" value="${employee?.hireDate?.split('T')[0] || ''}" required>
-        </div>
-        <div class="form-group">
-          <label>Отдел</label>
-          <select class="form-control" name="departmentId">
-            <option value="">Без отдела</option>
-            ${departments?.map(d => `
-              <option value="${d.id}" ${employee?.departmentId === d.id ? 'selected' : ''}>
-                ${d.name}
-              </option>
-            `)?.join('') || ''}
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Должность</label>
-          <select class="form-control" name="positionId" required>
-            <option value="">Выберите должность</option>
-            ${positions?.map(p => `
-              <option value="${p.id}" ${employee?.positionId === p.id ? 'selected' : ''}>
-                ${p.title}
-              </option>
-            `)?.join('') || ''}
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Адрес</label>
-          <input class="form-control" name="address" value="${employee?.address || ''}" required>
-        </div>
-        <button type="submit" class="btn">Сохранить</button>
-        <button type="button" class="btn btn-secondary" onclick="closeModal()">Отмена</button>
       </form>
     </div>
   `;
+
   document.body.appendChild(modal);
   document.getElementById('employeeForm').onsubmit = async (e) => {
     e.preventDefault();
@@ -440,7 +470,7 @@ async function showEmployeeForm(employee = null) {
 }
 
 async function deleteEmployee(id) {
-  if (confirm('Вы уверены, что хотите удалить этого сотрудника?')) {
+  if (customConfirm('Вы уверены, что хотите удалить этого сотрудника?')) {
     try {
       sendMessage({ action: 'deleteEmployee', id });
     } catch (error) {
@@ -535,7 +565,7 @@ function showDepartmentForm(department = null) {
 }
 
 async function deleteDepartment(id) {
-  if (confirm('Вы уверены, что хотите удалить этот отдел?')) {
+  if (customConfirm('Вы уверены, что хотите удалить этот отдел?')) {
     try {
       sendMessage({ action: 'deleteDepartment', id });
     } catch (error) {
@@ -611,7 +641,7 @@ function showProjectForm(project = null) {
 }
 
 async function deleteProject(id) {
-  if (confirm('Вы уверены, что хотите удалить этот проект?')) {
+  if (customConfirm('Вы уверены, что хотите удалить этот проект?')) {
     try {
       sendMessage({ action: 'deleteProject', id });
     } catch (error) {
