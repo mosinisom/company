@@ -1,0 +1,58 @@
+<!-- wwwroot/index.html -->
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InnovateSoft HR</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1>Управление персоналом</h1>
+
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('employees')">Сотрудники</button>
+      <button class="tab" onclick="showTab('departments')">Отделы</button>
+      <button class="tab" onclick="showTab('projects')">Проекты</button>
+      <button class="tab" onclick="showTab('positions')">Должности</button>
+    </div>
+
+    <div id="employees" class="tab-content">
+      <div class="card">
+        <h2>Список сотрудников</h2>
+        <button onclick="showEmployeeForm()">Добавить сотрудника</button>
+        <div id="employeesList"></div>
+      </div>
+    </div>
+
+    <div id="departments" class="tab-content" style="display: none;">
+      <div class="card">
+        <h2>Отделы</h2>
+        <button onclick="showDepartmentForm()">Добавить отдел</button>
+        <div id="departmentsList"></div>
+      </div>
+    </div>
+
+    <div id="projects" class="tab-content" style="display: none;">
+      <div class="card">
+        <h2>Проекты</h2>
+        <button onclick="showProjectForm()">Добавить проект</button>
+        <div id="projectsList"></div>
+      </div>
+    </div>
+
+    <div id="positions" class="tab-content" style="display: none;">
+      <div class="card">
+        <h2>Должности</h2>
+        <button onclick="showPositionForm()">Добавить должность</button>
+        <div id="positionsList"></div>
+      </div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+
+</html>
