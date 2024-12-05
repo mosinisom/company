@@ -6,13 +6,13 @@ public class Position
   public int Id { get; set; }
 
   [JsonPropertyName("title")]
-  public string Title { get; set; }
+  public string? Title { get; set; }
 
   [JsonPropertyName("salaryRange")]
-  public string SalaryRange { get; set; }
+  public string? SalaryRange { get; set; }
 
   [JsonPropertyName("responsibilities")]
-  public string Responsibilities { get; set; }
+  public string? Responsibilities { get; set; }
 
-  public ICollection<Employee> Employees { get; set; } = new List<Employee>();
+  public ICollection<Employee>? Employees { get; set; } = new List<Employee>();
 }

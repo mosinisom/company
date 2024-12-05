@@ -330,7 +330,22 @@ function confirm(message) {
   return window.confirm(message);
 }
 
-function showEmployeeForm(employee = null) {
+async function showEmployeeForm(employee = null) {
+  if (!positions.length) {
+    await new Promise(resolve => {
+      sendMessage({ action: "getPositions" });
+      const handler = (event) => {
+        const response = JSON.parse(event.data);
+        if (response.action === "getPositions") {
+          positions = response.data;
+          socket.removeEventListener('message', handler);
+          resolve();
+        }
+      };
+      socket.addEventListener('message', handler);
+    });
+  }
+
   const modal = document.createElement('div');
   modal.className = 'modal';
   modal.innerHTML = `
@@ -397,7 +412,7 @@ function showEmployeeForm(employee = null) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const data = {
-      id: employee?.id,
+      id: employee?.id || 0,
       firstName: formData.get('firstName'),
       lastName: formData.get('lastName'),
       email: formData.get('email'),
@@ -407,6 +422,7 @@ function showEmployeeForm(employee = null) {
       departmentId: formData.get('departmentId') ? parseInt(formData.get('departmentId')) : null,
       positionId: parseInt(formData.get('positionId')),
       address: formData.get('address'),
+      createdAt: employee?.createdAt || new Date().toISOString()
     };
     try {
       sendMessage({
@@ -489,10 +505,18 @@ function showDepartmentForm(department = null) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const managerId = formData.get('managerId');
+    const name = formData.get('name')?.trim();
+
+    if (!name) {
+      showError('Название отдела обязательно для заполнения');
+      return;
+    }
+
     const data = {
-      id: department?.Id,
-      name: formData.get('Name'),
-      managerId: managerId ? parseInt(ManagerId) : null
+      id: department?.id || 0,
+      name: name,
+      managerId: managerId ? parseInt(managerId) : null,
+      createdAt: department?.createdAt || new Date().toISOString()
     };
 
     try {
@@ -562,12 +586,13 @@ function showProjectForm(project = null) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const data = {
-      id: project?.Id,
-      name: formData.get('Name'),
-      description: formData.get('Description'),
-      status: formData.get('Status'),
-      startDate: formData.get('StartDate'),
-      endDate: formData.get('EndDate') || null
+      id: project?.id,
+      name: formData.get('name'), 
+      description: formData.get('description'),  
+      status: formData.get('status'), 
+      startDate: formData.get('startDate'), 
+      endDate: formData.get('endDate') || null, 
+      createdAt: new Date().toISOString()
     };
 
     try {

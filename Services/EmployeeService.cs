@@ -19,11 +19,11 @@ public class EmployeeService : IEmployeeService
       LastName = employee.LastName,
       Email = employee.Email,
       Phone = employee.Phone,
-      BirthDate = employee.BirthDate,
-      HireDate = employee.HireDate,
+      BirthDate = (DateTime)employee.BirthDate,
+      HireDate = (DateTime)employee.HireDate,
       DepartmentId = employee.DepartmentId,
       DepartmentName = employee.Department?.Name,
-      PositionId = employee.PositionId,
+      PositionId = (int)employee.PositionId,
       PositionTitle = employee.Position?.Title,
       Address = employee.Address
     };
