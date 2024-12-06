@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function initializeWebSocket() {
-  socket = new WebSocket("ws://localhost:5000/ws");
+  socket = new WebSocket("ws://localhost:5001/ws");
 
   socket.onopen = () => {
     console.log("WebSocket соединение установлено");
@@ -91,10 +91,6 @@ function closeModal() {
   document.querySelector('.modal')?.remove();
 }
 
-
-socket.onerror = function (error) {
-  console.error('WebSocket error:', error);
-};
 
 function showTab(tabName) {
   document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
@@ -293,10 +289,15 @@ function displayDepartments(departments) {
       <tbody>
         ${departments.map(dep => `
           <tr>
-            <td>${dep.name}</td>
+            <td>${dep.Name}</td>
             <td>
-              <button onclick='showDepartmentForm(${JSON.stringify(dep).replace(/'/g, "&#39;")})'>Редактировать</button>
-              <button onclick="deleteDepartment(${dep.id})">Удалить</button>
+              <button onclick='showDepartmentForm({
+                id: ${dep.Id},
+                name: "${dep.Name}",
+                managerId: ${dep.ManagerId || 'null'},
+                createdAt: "${dep.CreatedAt}"
+              })'>Редактировать</button>
+              <button onclick="deleteDepartment(${dep.Id})">Удалить</button>
             </td>
           </tr>
         `).join('')}
@@ -319,15 +320,24 @@ function displayProjects(projects) {
       </thead>
       <tbody>
         ${projects.map(proj => {
-    const department = departments.find(dep => dep.id === proj.departmentId);
+    const department = departments.find(dep => dep.Id === proj.DepartmentId);
+    const endDate = proj.endDate || proj.EndDate;
     return `
             <tr>
-              <td>${proj.name}</td>
-              <td>${department ? department.name : 'Без отдела'}</td>
-              <td>${getProjectStatus(proj.status)}</td>
+              <td>${proj.name || proj.Name || ''}</td>
+              <td>${department ? (department.name || department.Name) : 'Без отдела'}</td>
+              <td>${getProjectStatus(proj.status || proj.Status)}</td>
               <td>
-                <button onclick='showProjectForm(${JSON.stringify(proj).replace(/'/g, "&#39;")})'>Редактировать</button>
-                <button onclick="deleteProject(${proj.id})">Удалить</button>
+                <button onclick='showProjectForm({
+                  id: ${proj.id || proj.Id},
+                  name: "${proj.name || proj.Name || ''}",
+                  description: "${(proj.description || proj.Description || '').replace(/"/g, '&quot;')}",
+                  status: "${proj.status || proj.Status || 'new'}",
+                  startDate: "${proj.startDate || proj.StartDate || ''}",
+                  endDate: ${endDate ? `"${endDate}"` : null},
+                  departmentId: ${proj.departmentId || proj.DepartmentId || 'null'}
+                })'>Редактировать</button>
+                <button onclick="deleteProject(${proj.id || proj.Id})">Удалить</button>
               </td>
             </tr>
           `;
@@ -410,8 +420,8 @@ async function showEmployeeForm(employee = null) {
             <select class="form-control" name="departmentId">
               <option value="">Без отдела</option>
               ${departments?.map(d => `
-                <option value="${d.id}" ${employee?.departmentId === d.id ? 'selected' : ''}>
-                  ${d.name}
+                <option value="${d.Id}" ${employee?.departmentId === d.Id ? 'selected' : ''}>
+                  ${d.Name}
                 </option>
               `)?.join('') || ''}
             </select>
@@ -521,8 +531,8 @@ function showDepartmentForm(department = null) {
           <select class="form-control" name="managerId">
             <option value="">Без руководителя</option>
             ${employees?.map(e => `
-              <option value="${e.id}" ${department?.managerId === e.id ? 'selected' : ''}>
-                ${e.firstName} ${e.lastName}
+              <option value="${e.Id}" ${department?.managerId === e.Id ? 'selected' : ''}>
+                ${e.FirstName} ${e.LastName}
               </option>
             `)?.join('') || ''}
           </select>

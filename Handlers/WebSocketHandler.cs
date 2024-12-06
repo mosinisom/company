@@ -83,8 +83,11 @@ public class WebSocketHandler
                   response = await _employeeService.CreateAsync(newEmployee);
                   break;
                 case "createDepartment":
-                  var newDepartment = request.Data.Deserialize<Department>();
-                  response = await _departmentService.CreateAsync(newDepartment);
+                  var newDepartmentDto = JsonSerializer.Deserialize<DepartmentDto>(request.Data.ToString(), new JsonSerializerOptions
+                  {
+                    PropertyNameCaseInsensitive = true
+                  });
+                  response = await _departmentService.CreateAsync(newDepartmentDto);
                   break;
                 case "createProject":
                   var newProject = request.Data.Deserialize<Project>();
@@ -92,14 +95,8 @@ public class WebSocketHandler
                   break;
                 case "createPosition":
                   {
-                    var position = request.Data.Deserialize<Position>(new JsonSerializerOptions
-                    {
-                      PropertyNameCaseInsensitive = true
-                    });
-                    if (position != null)
-                    {
-                      response = await _positionService.CreateAsync(position);
-                    }
+                    var newPosition = request.Data.Deserialize<Position>();
+                    response = await _positionService.CreateAsync(newPosition);
                     break;
                   }
 
@@ -109,8 +106,11 @@ public class WebSocketHandler
                   response = await _employeeService.UpdateAsync(updatedEmployee);
                   break;
                 case "updateDepartment":
-                  var updatedDepartment = request.Data.Deserialize<Department>();
-                  response = await _departmentService.UpdateAsync(updatedDepartment);
+                  var updatedDepartmentDto = JsonSerializer.Deserialize<DepartmentDto>(request.Data.ToString(), new JsonSerializerOptions
+                  {
+                    PropertyNameCaseInsensitive = true
+                  });
+                  response = await _departmentService.UpdateAsync(updatedDepartmentDto);
                   break;
                 case "updateProject":
                   var updatedProject = request.Data.Deserialize<Project>();
